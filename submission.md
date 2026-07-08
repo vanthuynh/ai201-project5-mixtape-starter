@@ -267,4 +267,8 @@ tag row unless deduplicated by the caller.
 **Your fix and side-effect check**: changed `return [song.to_dict() for song in songs[:-1]]` to `return [song.to_dict() for song in songs]`
 
 
+## AI Usages
 
+- I asked Claude to explain Flask's Blueprint concept in simplified terms and provide examples, I also asked what `timedate(hour=24)` means
+
+- I asked Claude to generate a test function to test `get_friends_listening_now()` function 
