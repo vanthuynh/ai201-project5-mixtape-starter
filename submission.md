@@ -220,6 +220,9 @@ tag row unless deduplicated by the caller.
 5. Bug #5
 
 - While testing the fix for the second bug, I came across a failture in `test_playlists.py`
+- I suspected that the return statement `return [song.to_dict() for song in songs[:-1]]` drops the last song from the playlist
+- `return [song.to_dict() for song in songs[:-1]]` drops the last song from the playlist
+
 ---
 
 
@@ -241,27 +244,27 @@ tag row unless deduplicated by the caller.
 
 ### Issue #2 - Friends Listening Now shows people from yesterday
 
-**How you reproduced it:** I run the test function with `pytest tests/test_streaks.py::test_streak_increments_on_sunday -v` to reproduce the bug
+**How you reproduced it:** I asked Claude to generate a test function to test `get_friends_listening_now()` function 
 
-**How you found the root cause:** I suspected that the condition `today.weekday() != 6:`
+**How you found the root cause:** I was confident that the bug exist in `get_friends_listening_now()` function 
 
-**What was your navigation path?** `streak_service.py` --> `update_listening_streak()`
+**What was your navigation path?** `/services` module --> `feed.service.py` --> `get_friends_listening_now()`
 
-**The root cause** `elif` condition shouldn't have checked `today.weekday() != 6`
+**The root cause** instead of returning the latest songs friends listened to today, the function returns latest songs friends listened to within 24 hour
 
-**Your fix and side-effect check**: remove `today.weekday() != 6` as we increment streak by 1 only if `day_since_last` equals 1
+**Your fix and side-effect check**: remove `timedate(hours=24)` and today's boundary is calculated by the difference between current time and 0:00AM of today.
 
-### Issue #3 - The same song keeps showing up twice in search
+### Issue #5 - The last song in a playlist never shows up
 
-**How you reproduced it:** I run the test function with `pytest tests/test_streaks.py::test_streak_increments_on_sunday -v` to reproduce the bug
+**How you reproduced it:** While running the `test_playlist()` function to test playlist return for the #2 fix, the test case failed
 
-**How you found the root cause:** I suspected that the condition `today.weekday() != 6:`
+**How you found the root cause:** I suspected that the return statement `return [song.to_dict() for song in songs[:-1]]` drops the last song from the playlist
 
-**What was your navigation path?** `streak_service.py` --> `update_listening_streak()`
+**What was your navigation path?** `/services` module --> `playlist_service.py` --> `get_playlist_songs()`
 
-**The root cause** `elif` condition shouldn't have checked `today.weekday() != 6`
+**The root cause** `return [song.to_dict() for song in songs[:-1]]` drops the last song from the playlist
 
-**Your fix and side-effect check**: remove `today.weekday() != 6` as we increment streak by 1 only if `day_since_last` equals 1
+**Your fix and side-effect check**: changed `return [song.to_dict() for song in songs[:-1]]` to `return [song.to_dict() for song in songs]`
 
 
 
