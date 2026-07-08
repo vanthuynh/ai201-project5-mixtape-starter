@@ -213,6 +213,13 @@ tag row unless deduplicated by the caller.
 
 2. Bug #2
 
+- I first read through all the functions from `/services` module and came across `get_friends_listening_now()`
+- I was not entirely sure where the bug is located so I asked Claude to explain what `timedelta(hours=24)` does.
+- I then recognize that `RECENT_THRESHOLD` maybe the root cause of this bug so I asked Claude to implemented a test function to test `get_friends_listening_now()` with fake data as Monday morning and Sunday night, which falls within 24 hour time range.
+
+5. Bug #5
+
+- While testing the fix for the second bug, I came across a failture in `test_playlists.py`
 ---
 
 
