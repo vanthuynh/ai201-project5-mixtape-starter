@@ -200,3 +200,61 @@ tag row unless deduplicated by the caller.
 | Friends' recent activity | `feed_service` | reads `ListeningEvent` rows written by `record_listening_event` |
 | Playlist song order | `playlist_entries.position` | writes in `add_to_playlist`; reads in `get_playlist_songs` |
 | Friendship graph | `friendships` table | read by `feed_service` only — no route currently manages it |
+
+
+## How I Reproduced the bugs
+
+
+1. Bug #1 - Listening streak keeps repeating
+
+- I first read through all the functions defined within  streak_service.py file and came across `update_listening_streak()` with if-else clause.
+- I suspected that the condition `today.weekday() != 6:` is what causes the bug so I run the test function with `pytest tests/test_streaks.py::test_streak_increments_on_sunday -v` to reproduce the bug
+- The test fails, which confirms my suspicion
+
+2. Bug #2
+
+---
+
+
+## Root Cause Analysis
+
+
+### Issue #1 - My listening streak keeps resetting
+
+**How you reproduced it:** I run the test function with `pytest tests/test_streaks.py::test_streak_increments_on_sunday -v` to reproduce the bug
+
+**How you found the root cause:** I suspected that the condition `today.weekday() != 6:`
+
+**What was your navigation path?** `streak_service.py` --> `update_listening_streak()`
+
+**The root cause** `elif` condition shouldn't have checked `today.weekday() != 6`
+
+**Your fix and side-effect check**: remove `today.weekday() != 6` as we increment streak by 1 only if `day_since_last` equals 1
+
+
+### Issue #2 - Friends Listening Now shows people from yesterday
+
+**How you reproduced it:** I run the test function with `pytest tests/test_streaks.py::test_streak_increments_on_sunday -v` to reproduce the bug
+
+**How you found the root cause:** I suspected that the condition `today.weekday() != 6:`
+
+**What was your navigation path?** `streak_service.py` --> `update_listening_streak()`
+
+**The root cause** `elif` condition shouldn't have checked `today.weekday() != 6`
+
+**Your fix and side-effect check**: remove `today.weekday() != 6` as we increment streak by 1 only if `day_since_last` equals 1
+
+### Issue #3 - The same song keeps showing up twice in search
+
+**How you reproduced it:** I run the test function with `pytest tests/test_streaks.py::test_streak_increments_on_sunday -v` to reproduce the bug
+
+**How you found the root cause:** I suspected that the condition `today.weekday() != 6:`
+
+**What was your navigation path?** `streak_service.py` --> `update_listening_streak()`
+
+**The root cause** `elif` condition shouldn't have checked `today.weekday() != 6`
+
+**Your fix and side-effect check**: remove `today.weekday() != 6` as we increment streak by 1 only if `day_since_last` equals 1
+
+
+
